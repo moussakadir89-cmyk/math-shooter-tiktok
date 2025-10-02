@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Math Shooter Challenge - Can You Solve & Shoot? 🧠💥</title>
+    <meta name="description" content="Interactive math shooter game! Solve equations by shooting the correct answers. Can you beat level 10? Perfect for TikTok challenges!">
+    <meta name="keywords" content="math game, shooter, challenge, TikTok, viral, brain training, education">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourusername.github.io/math-shooter-tiktok/">
+    <meta property="og:title" content="🎯 Math Shooter Challenge - Can You Beat Level 10?">
+    <meta property="og:description" content="Interactive math shooting game that's taking TikTok by storm! Can you solve equations faster than 98% of players?">
+    <meta property="og:image" content="https://yourusername.github.io/math-shooter-tiktok/preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://yourusername.github.io/math-shooter-tiktok/">
+    <meta property="twitter:title" content="🎯 Math Shooter Challenge - Can You Beat Level 10?">
+    <meta property="twitter:description" content="Interactive math shooting game that's taking TikTok by storm! Can you solve equations faster than 98% of players?">
+    <meta property="twitter:image" content="https://yourusername.github.io/math-shooter-tiktok/preview.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            position: relative;
+        }
+
+        /* TikTok optimized 9:16 aspect ratio */
+        .game-container {
+            width: 100%;
+            max-width: 375px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            border: 2px solid #ff6b9d;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+        }
+
+        .header {
+            background: rgba(255, 107, 157, 0.9);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            position: relative;
+            z-index: 100;
+        }
+
+        .tiktok-branding {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ff6b9d;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 200;
+        }
+
+        .game-area {
+            width: 100%;
+            height: calc(100vh - 120px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player {
+            width: 40px;
+            height: 40px;
+            background: #00ff88;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 3px solid white;
+            box-shadow: 0 0 15px #00ff88;
+            transition: left 0.1s ease;
+            z-index: 50;
+        }
+
+        .enemy {
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            border-radius: 10px;
+            position: absolute;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.7);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .bullet {
+            width: 8px;
+            height: 15px;
+            background: #ffff00;
+            border-radius: 4px;
+            position: absolute;
+            box-shadow: 0 0 8px #ffff00;
+        }
+
+        .explosion {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #ffff00 0%, #ff6b00 50%, transparent 70%);
+            border-radius: 50%;
+            position: absolute;
+            animation: explode 0.5s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .score-board {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 100;
+        }
+
+        .current-equation {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 3px solid #ff6b9d;
+            z-index: 100;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 107, 157, 0.8);
+            border: 3px solid white;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover, .control-btn:active {
+            background: #ff6b9d;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.8);
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            font-size: 12px;
+            z-index: 100;
+        }
+
+        .viral-text {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff6b9d;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            z-index: 100;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .share-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .share-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .share-btn {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+
+        .share-btn:hover {
+            background: #e55a87;
+            transform: scale(1.05);
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 107, 157, 0.95);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 500;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #ff6b9d;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .game-container {
+                max-width: 100%;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .header {
+                font-size: 14px;
+                padding: 8px;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="tiktok-branding">📱 TikTok Game</div>
+        <div class="header">🎯 Math Shooter Challenge - Solve & Shoot! 🧠💥</div>
+        
+        <div class="stars" id="stars"></div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="score-board">
+                Score: <span id="score">0</span> | Level: <span id="level">1</span>
+            </div>
+            
+            <div class="current-equation" id="currentEquation">
+                Solve: 5 + 3 = ?
+            </div>
+            
+            <div class="player" id="player"></div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-btn" id="leftBtn">←</div>
+            <div class="control-btn" id="shootBtn">🔥</div>
+            <div class="control-btn" id="rightBtn">→</div>
+        </div>
+        
+        <div class="instruction">
+            Move & shoot the correct answer! 🎯
+        </div>
+        
+        <div class="viral-text">
+            Can you beat level 10? 🔥 Challenge your friends!
+        </div>
+        
+        <div class="game-over" id="gameOver">
+            <h2>🎉 Amazing Score! 🎉</h2>
+            <p>You scored: <span id="finalScore">0</span></p>
+            <p>Can your friends do better?</p>
+            <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
+            <button class="restart-btn" onclick="shareScore()">Share Score 📱</button>
+        </div>
+        
+        <div class="share-overlay" id="shareOverlay">
+            <div class="share-content">
+                <h3>🔥 Share Your Score! 🔥</h3>
+                <p id="shareText">I scored [score] in Math Shooter! Can you beat me? 🎯</p>
+                <button class="share-btn" onclick="copyShareText()">Copy Text 📋</button>
+                <button class="share-btn" onclick="closeShare()">Close ❌</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let gameState = {
+            score: 0,
+            level: 1,
+            playerPos: 50,
+            currentEquation: { question: '', answer: 0 },
+            enemies: [],
+            bullets: [],
+            gameRunning: true,
+            gameSpeed: 1000
+        };
+
+        // DOM elements
+        const gameArea = document.getElementById('gameArea');
+        const player = document.getElementById('player');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const equationElement = document.getElementById('currentEquation');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+
+        // Generate random math equation
+        function generateEquation() {
+            const operations = ['+', '-', '*'];
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            let num1, num2, answer;
+            
+            switch(operation) {
+                case '+':
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * 20) + 1;
+                    answer = num1 + num2;
+                    break;
+                case '-':
+                    num1 = Math.floor(Math.random() * 30) + 10;
+                    num2 = Math.floor(Math.random() * num1);
+                    answer = num1 - num2;
+                    break;
+                case '*':
+                    num1 = Math.floor(Math.random() * 10) + 1;
+                    num2 = Math.floor(Math.random() * 10) + 1;
+                    answer = num1 * num2;
+                    break;
+            }
+            
+            return {
+                question: `${num1} ${operation} ${num2} = ?`,
+                answer: answer
+            };
+        }
+
+        // Create enemy with answer
+        function createEnemy(answer, isCorrect = false) {
+            const enemy = document.createElement('div');
+            enemy.className = 'enemy';
+            enemy.textContent = answer;
+            enemy.style.left = Math.random() * (gameArea.offsetWidth - 60) + 'px';
+            enemy.style.top = '20px';
+            enemy.dataset.answer = answer;
+            enemy.dataset.correct = isCorrect;
+            
+            if (isCorrect) {
+                enemy.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                enemy.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.7)';
+            }
+            
+            gameArea.appendChild(enemy);
+            gameState.enemies.push(enemy);
+        }
+
+        // Update current equation display
+        function updateEquation() {
+            gameState.currentEquation = generateEquation();
+            equationElement.textContent = `Solve: ${gameState.currentEquation.question}`;
+            
+            // Clear existing enemies
+            gameState.enemies.forEach(enemy => enemy.remove());
+            gameState.enemies = [];
+            
+            // Create enemies with answers (1 correct, 2-3 wrong)
+            const wrongAnswers = [];
+            const correctAnswer = gameState.currentEquation.answer;
+            
+            // Generate wrong answers
+            for (let i = 0; i < 2; i++) {
+                let wrongAnswer;
+                do {
+                    wrongAnswer = correctAnswer + Math.floor(Math.random() * 20) - 10;
+                } while (wrongAnswer === correctAnswer || wrongAnswers.includes(wrongAnswer) || wrongAnswer < 0);
+                wrongAnswers.push(wrongAnswer);
+            }
+            
+            // Create enemies
+            createEnemy(correctAnswer, true);
+            wrongAnswers.forEach(answer => createEnemy(answer, false));
+        }
+
+        // Move player
+        function movePlayer(direction) {
+            if (!gameState.gameRunning) return;
+            
+            if (direction === 'left' && gameState.playerPos > 10) {
+                gameState.playerPos -= 15;
+            } else if (direction === 'right' && gameState.playerPos < 90) {
+                gameState.playerPos += 15;
+            }
+            
+            player.style.left = gameState.playerPos + '%';
+        }
+
+        // Shoot bullet
+        function shoot() {
+            if (!gameState.gameRunning) return;
+            
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            bullet.style.left = (gameState.playerPos + 2) + '%';
+            bullet.style.bottom = '70px';
+            
+            gameArea.appendChild(bullet);
+            gameState.bullets.push(bullet);
+            
+            // Animate bullet
+            let bulletPos = 70;
+            const bulletInterval = setInterval(() => {
+                bulletPos += 10;
+                bullet.style.bottom = bulletPos + 'px';
+                
+                if (bulletPos > gameArea.offsetHeight) {
+                    bullet.remove();
+                    gameState.bullets = gameState.bullets.filter(b => b !== bullet);
+                    clearInterval(bulletInterval);
+                }
+                
+                // Check collision with enemies
+                gameState.enemies.forEach(enemy => {
+                    const bulletRect = bullet.getBoundingClientRect();
+                    const enemyRect = enemy.getBoundingClientRect();
+                    
+                    if (bulletRect.left < enemyRect.right &&
+                        bulletRect.right > enemyRect.left &&
+                        bulletRect.top < enemyRect.bottom &&
+                        bulletRect.bottom > enemyRect.top) {
+                        
+                        // Hit!
+                        const isCorrect = enemy.dataset.correct === 'true';
+                        
+                        if (isCorrect) {
+                            // Correct answer
+                            gameState.score += 10 * gameState.level;
+                            createExplosion(enemy);
+                            updateScore();
+                            updateEquation();
+                            
+                            // Level up every 5 correct answers
+                            if (gameState.score % 50 === 0) {
+                                gameState.level++;
+                                gameState.gameSpeed = Math.max(500, gameState.gameSpeed - 100);
+                            }
+                        } else {
+                            // Wrong answer - game over
+                            endGame();
+                        }
+                        
+                        bullet.remove();
+                        enemy.remove();
+                        gameState.bullets = gameState.bullets.filter(b => b !== bullet);
+                        gameState.enemies = gameState.enemies.filter(e => e !== enemy);
+                        clearInterval(bulletInterval);
+                    }
+                });
+            }, 50);
+        }
+
+        // Create explosion effect
+        function createExplosion(element) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.style.left = element.style.left;
+            explosion.style.top = element.style.top;
+            
+            gameArea.appendChild(explosion);
+            
+            setTimeout(() => {
+                explosion.remove();
+            }, 500);
+        }
+
+        // Update score display
+        function updateScore() {
+            scoreElement.textContent = gameState.score;
+            levelElement.textContent = gameState.level;
+        }
+
+        // End game
+        function endGame() {
+            gameState.gameRunning = false;
+            finalScoreElement.textContent = gameState.score;
+            gameOverElement.style.display = 'block';
+            
+            // Track high score
+            const highScore = localStorage.getItem('mathShooterHighScore') || 0;
+            if (gameState.score > highScore) {
+                localStorage.setItem('mathShooterHighScore', gameState.score);
+            }
+        }
+
+        // Restart game
+        function restartGame() {
+            gameState = {
+                score: 0,
+                level: 1,
+                playerPos: 50,
+                currentEquation: { question: '', answer: 0 },
+                enemies: [],
+                bullets: [],
+                gameRunning: true,
+                gameSpeed: 1000
+            };
+            
+            // Clear game area
+            gameState.enemies.forEach(enemy => enemy.remove());
+            gameState.bullets.forEach(bullet => bullet.remove());
+            gameState.enemies = [];
+            gameState.bullets = [];
+            
+            gameOverElement.style.display = 'none';
+            player.style.left = '50%';
+            
+            updateScore();
+            updateEquation();
+        }
+
+        // Share score
+        function shareScore() {
+            const shareText = `🎯 I scored ${gameState.score} in Math Shooter Challenge! 🧠💥 Can you beat me? Play now! #MathChallenge #TikTokGame #BrainTraining`;
+            document.getElementById('shareText').textContent = shareText;
+            document.getElementById('shareOverlay').style.display = 'flex';
+        }
+
+        // Copy share text
+        function copyShareText() {
+            const shareText = document.getElementById('shareText').textContent;
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('📋 Copied to clipboard! Paste it in your TikTok post! 🔥');
+            });
+        }
+
+        // Close share overlay
+        function closeShare() {
+            document.getElementById('shareOverlay').style.display = 'none';
+        }
+
+        // Generate stars background
+        function generateStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('leftBtn').addEventListener('click', () => movePlayer('left'));
+        document.getElementById('rightBtn').addEventListener('click', () => movePlayer('right'));
+        document.getElementById('shootBtn').addEventListener('click', shoot);
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    movePlayer('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    movePlayer('right');
+                    break;
+                case ' ':
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    shoot();
+                    break;
+            }
+        });
+
+        // Touch controls for mobile
+        let touchStartX = 0;
+        gameArea.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        gameArea.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    movePlayer('left');
+                } else {
+                    movePlayer('right');
+                }
+            } else {
+                shoot();
+            }
+        });
+
+        // Initialize game
+        generateStars();
+        updateEquation();
+        updateScore();
+
+        // Auto-share prompt after good performance
+        setTimeout(() => {
+            if (gameState.score > 30 && gameState.gameRunning) {
+                const shouldShare = confirm('🔥 Great score! Want to challenge your TikTok friends? 📱');
+                if (shouldShare) {
+                    shareScore();
+                }
+            }
+        }, 60000); // After 1 minute
+
+        console.log('🎯 Math Shooter Challenge Ready! 🧠💥');
+        console.log('Perfect for TikTok sharing and viral challenges! 📱🔥');
+    </script>
+</body>
+</html>
